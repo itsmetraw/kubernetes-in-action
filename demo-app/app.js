@@ -1,13 +1,21 @@
-const http = require("http");
-const os = require("os");
+const http = require('http');
+const os = require('os');
 
+console.log("Kubia server starting...");
 
-console.log("Kubia server starting");
+var requestCount = 0;
 
-var server = http.createServer((req, res)=>{
-    console.log(`Recieved a request from ${req.socket.remoteAddress}`);
-    res.writeHead(200);
-    res.end(`You've hit ${os.hostname()}\n`);
-});
+var handler = function(request, response) {
+  console.log("Received request from " + request.connection.remoteAddress);
+  requestCount++;
+  if (requestCount > 5) {
+    response.writeHead(500);
+    response.end("I'm not well. Please restart me!");
+    return;
+  }
+  response.writeHead(200);
+  response.end("You've hit " + os.hostname() + "\n");
+};
 
-server.listen(8080);
+var www = http.createServer(handler);
+www.listen(8080);
